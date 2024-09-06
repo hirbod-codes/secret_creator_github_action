@@ -13,6 +13,8 @@ inputs:
         required: true
     sshServerUsername:
         required: true
+    sshServerPassword:
+        required: true
     secretsJson:
         description: "secrets to be created in targeted docker swarm. comes from 'toJson(secrets)' context or an input json."
         required: true
