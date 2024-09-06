@@ -24,37 +24,57 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(require("@actions/core"));
-/**
- * Wait for a number of milliseconds.
- * @param milliseconds The number of milliseconds to wait.
- * @returns {Promise<string>} Resolves with 'done!' after the wait is over.
- */
-async function wait(milliseconds) {
-    return new Promise(resolve => {
-        if (isNaN(milliseconds)) {
-            throw new Error('milliseconds not a number');
-        }
-        setTimeout(() => resolve('done!'), milliseconds);
-    });
-}
-/**
- * The main function for the action.
- * @returns {Promise<void>} Resolves when the action is complete.
- */
+const ssh2_1 = require("ssh2");
 async function run() {
     try {
-        const ms = core.getInput('milliseconds');
-        // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
-        core.debug(`Waiting ${ms} milliseconds ...`);
-        // Log the current timestamp, wait, then log the new timestamp
-        core.debug(new Date().toTimeString());
-        await wait(parseInt(ms, 10));
-        core.debug(new Date().toTimeString());
-        // Set outputs for other workflow steps to use
-        core.setOutput('time', new Date().toTimeString());
+        const removePreviousSwarmSecrets = core.getInput('removePreviousSwarmSecrets', { required: true, trimWhitespace: true });
+        const swarmSecretsPrefix = core.getInput('swarmSecretsPrefix', { required: true, trimWhitespace: true });
+        const SSH_SERVER_ADDRESS = core.getInput('sshServerAddress', { required: true, trimWhitespace: true });
+        const SSH_SERVER_PORT = core.getInput('sshServerPort', { required: true, trimWhitespace: true });
+        const SSH_SERVER_USERNAME = core.getInput('sshServerUsername', { required: true, trimWhitespace: true });
+        const secretsJson = core.getInput('secretsJson', { required: true, trimWhitespace: true });
+        const secrets = JSON.parse(secretsJson);
+        const client = new ssh2_1.Client();
+        client.on('close', () => core.info('Client :: close'));
+        client.on('error', (err) => core.error(err.message));
+        client.on('ready', () => {
+            core.info('Client :: ready');
+            if (Boolean(removePreviousSwarmSecrets) === true)
+                client.shell((err, stream) => {
+                    if (err)
+                        throw err;
+                    stream.on('close', () => core.info('Stream :: close'));
+                    stream.on('data', (data) => core.info('Stream :: Out: ' + data.toString()));
+                    stream.end('docker secret rm $(docker secret ls -q)');
+                });
+            Object
+                .entries(secrets)
+                .filter(s => s[0].startsWith(swarmSecretsPrefix))
+                .forEach(s => {
+                client.shell((err, stream) => {
+                    if (err)
+                        throw err;
+                    stream.on('close', () => core.info('Stream :: close'));
+                    stream.on('data', (data) => core.info('Stream :: Out: ' + data.toString()));
+                    stream.end(`docker secret rm ${s[0]}`);
+                });
+                client.shell((err, stream) => {
+                    if (err)
+                        throw err;
+                    stream.on('close', () => core.info('Stream :: close'));
+                    stream.on('data', (data) => core.info('Stream :: Out: ' + data.toString()));
+                    stream.end(`${s[1]} | docker secret create ${s[0]}  -`);
+                });
+            });
+            client.end();
+        });
+        client.connect({
+            host: SSH_SERVER_ADDRESS,
+            port: Number.parseInt(SSH_SERVER_PORT),
+            username: SSH_SERVER_USERNAME,
+        });
     }
     catch (error) {
-        // Fail the workflow run if an error occurs
         if (error instanceof Error)
             core.setFailed(error.message);
     }
