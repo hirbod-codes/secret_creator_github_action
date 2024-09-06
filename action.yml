@@ -1,13 +1,21 @@
 name: "Hello World"
 description: "Greet someone and record the time"
 inputs:
-    milliseconds: # id of input
-        description: "time to wait"
+    removePreviousSwarmSecrets:
+        description: boolean
         required: true
-        default: '10000'
-outputs:
-    time: # id of output
-        description: "The time we greeted you"
+    swarmSecretsPrefix:
+        default: SWARM_
+        required: true
+    sshServerAddress:
+        required: true
+    sshServerPort:
+        required: true
+    sshServerUsername:
+        required: true
+    secretsJson:
+        description: secrets to be created in targeted docker swarm. comes from ${{ toJson(secrets) }} or an input json.
+        required: true
 runs:
     using: "node20"
     main: "dist/index.js"
