@@ -40,14 +40,14 @@ async function run(): Promise<void> {
 
         const client = new Client()
 
-        client.on('close', () => console.log('close'))
+        client.on('close', () => core.info('close'))
 
-        client.on('end', () => console.log('end'))
+        client.on('end', () => core.info('end'))
 
-        client.on('error', (err) => console.error(err))
+        client.on('error', (err) => core.error(err))
 
         client.on('ready', async () => {
-            console.log('Client :: ready')
+            core.info('Client :: ready')
 
             if (Boolean(removePreviousSwarmSecrets) === true)
                 await execution(client, 'docker secret rm $(docker secret ls -q)')
