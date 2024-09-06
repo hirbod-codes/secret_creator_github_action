@@ -1,5 +1,28 @@
 import * as core from '@actions/core'
-import { Client } from 'ssh2'
+import { Client, ClientCallback, ClientChannel } from 'ssh2'
+
+function execution(client: Client, command: string): Promise<void> {
+    return new Promise((res, rej) => {
+        client.exec(command, (err: Error | undefined, stream: ClientChannel) => {
+            if (err) {
+                throw err
+            }
+
+            stream.on('close', (code: any, signal: any) => {
+                console.log('Stream :: close :: code: ' + code + ', signal: ' + signal);
+                res()
+            })
+
+            stream.on('data', (data: any) => {
+                console.log('STDOUT: ' + data);
+            })
+
+            stream.stderr.on('data', (data) => {
+                console.log('STDERR: ' + data);
+            })
+        })
+    })
+}
 
 async function run(): Promise<void> {
     try {
@@ -9,6 +32,7 @@ async function run(): Promise<void> {
         const SSH_SERVER_ADDRESS: string = core.getInput('sshServerAddress', { required: true, trimWhitespace: true })
         const SSH_SERVER_PORT: string = core.getInput('sshServerPort', { required: true, trimWhitespace: true })
         const SSH_SERVER_USERNAME: string = core.getInput('sshServerUsername', { required: true, trimWhitespace: true })
+        const SSH_SERVER_PASSWORD: string = core.getInput('sshServerPassword', { required: true, trimWhitespace: true })
 
         const secretsJson: string = core.getInput('secretsJson', { required: true, trimWhitespace: true })
 
@@ -16,51 +40,26 @@ async function run(): Promise<void> {
 
         const client = new Client()
 
-        client.on('close', () => core.info('Client :: close'))
+        client.on('close', () => console.log('close'))
 
-        client.on('error', (err) => core.error(err.message))
+        client.on('end', () => console.log('end'))
 
-        client.on('ready', () => {
-            core.info('Client :: ready')
+        client.on('error', (err) => console.error(err))
+
+        client.on('ready', async () => {
+            console.log('Client :: ready')
 
             if (Boolean(removePreviousSwarmSecrets) === true)
-                client.shell((err, stream) => {
-                    if (err)
-                        throw err
+                await execution(client, 'docker secret rm $(docker secret ls -q)')
 
-                    stream.on('close', () => core.info('Stream :: close'))
-
-                    stream.on('data', (data: any) => core.info('Stream :: Out: ' + data.toString()))
-
-                    stream.end('docker secret rm $(docker secret ls -q)')
-                })
-
-            Object
+            const filteredSecretEntries = Object
                 .entries(secrets)
                 .filter(s => s[0].startsWith(swarmSecretsPrefix))
-                .forEach(s => {
-                    client.shell((err, stream) => {
-                        if (err)
-                            throw err
 
-                        stream.on('close', () => core.info('Stream :: close'))
-
-                        stream.on('data', (data: any) => core.info('Stream :: Out: ' + data.toString()))
-
-                        stream.end(`docker secret rm ${s[0]}`)
-                    })
-
-                    client.shell((err, stream) => {
-                        if (err)
-                            throw err
-
-                        stream.on('close', () => core.info('Stream :: close'))
-
-                        stream.on('data', (data: any) => core.info('Stream :: Out: ' + data.toString()))
-
-                        stream.end(`${s[1]} | docker secret create ${s[0]}  -`)
-                    })
-                })
+            for (let i = 0; i < filteredSecretEntries.length; i++) {
+                const secretEntry = filteredSecretEntries[i];
+                await execution(client, `${secretEntry[1]} | docker secret create ${secretEntry[0]}  -`)
+            }
 
             client.end()
         })
@@ -69,6 +68,7 @@ async function run(): Promise<void> {
             host: SSH_SERVER_ADDRESS,
             port: Number.parseInt(SSH_SERVER_PORT),
             username: SSH_SERVER_USERNAME,
+            password: SSH_SERVER_PASSWORD,
         })
     } catch (error) {
         if (error instanceof Error)
