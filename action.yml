@@ -14,7 +14,7 @@ inputs:
     sshServerUsername:
         required: true
     secretsJson:
-        description: secrets to be created in targeted docker swarm. comes from ${{ toJson(secrets) }} or an input json.
+        description: "secrets to be created in targeted docker swarm. comes from 'toJson(secrets)' context or an input json."
         required: true
 runs:
     using: "node20"
