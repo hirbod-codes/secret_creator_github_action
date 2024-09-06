@@ -20,4 +20,5 @@ jobs:
                 sshServerAddress: ''
                 sshServerPort: ''
                 sshServerUsername: ''
+                sshServerPassword: ''
                 secretsJson: ''
