@@ -44,24 +44,29 @@ async function run(): Promise<void> {
 
         client.on('end', () => core.info('end'))
 
-        client.on('error', (err) => core.error(err))
+        client.on('error', (err) => { throw err })
 
         client.on('ready', async () => {
-            core.info('Client :: ready')
+            try {
+                core.info('Client :: ready')
 
-            if (Boolean(removePreviousSwarmSecrets) === true)
-                await execution(client, 'docker secret rm $(docker secret ls -q)')
+                if (Boolean(removePreviousSwarmSecrets) === true)
+                    await execution(client, 'docker secret rm $(docker secret ls -q)')
 
-            const filteredSecretEntries = Object
-                .entries(secrets)
-                .filter(s => s[0].startsWith(swarmSecretsPrefix))
+                const filteredSecretEntries = Object
+                    .entries(secrets)
+                    .filter(s => s[0].startsWith(swarmSecretsPrefix))
 
-            for (let i = 0; i < filteredSecretEntries.length; i++) {
-                const secretEntry = filteredSecretEntries[i];
-                await execution(client, `${secretEntry[1]} | docker secret create ${secretEntry[0]}  -`)
+                for (let i = 0; i < filteredSecretEntries.length; i++) {
+                    const secretEntry = filteredSecretEntries[i];
+                    await execution(client, `${secretEntry[1]} | docker secret create ${secretEntry[0]}  -`)
+                }
+            } catch (err) {
+                client.end()
+                throw err
+            } finally {
+                client.end()
             }
-
-            client.end()
         })
 
         client.connect({
