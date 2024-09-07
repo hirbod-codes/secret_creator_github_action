@@ -74,6 +74,8 @@ async function run(): Promise<void> {
             username: SSH_SERVER_USERNAME,
             password: SSH_SERVER_PASSWORD,
         })
+
+        setTimeout(() => { }, 60000)
     } catch (error) {
         if (error instanceof Error)
             core.setFailed(error)
