@@ -61,6 +61,8 @@ async function run() {
                         const secretEntry = filteredSecretEntries[i];
                         await execution(client, `${secretEntry[1]} | docker secret create ${secretEntry[0]}  -`)
                     }
+
+                    res()
                 } catch (err) {
                     client.end()
                     res()
