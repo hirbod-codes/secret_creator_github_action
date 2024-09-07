@@ -68,6 +68,8 @@ async function run(): Promise<void> {
             }
         })
 
+        core.info(SSH_SERVER_ADDRESS.slice(0, 5))
+
         client.connect({
             host: SSH_SERVER_ADDRESS,
             port: Number.parseInt(SSH_SERVER_PORT),
