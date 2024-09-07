@@ -1,5 +1,5 @@
 import * as core from '@actions/core'
-import { Client, ClientChannel } from 'node_moduless/@types/ssh2'
+import { Client, ClientChannel } from 'ssh2'
 
 function execution(client: Client, command: string): Promise<void> {
     return new Promise((res, rej) => {
