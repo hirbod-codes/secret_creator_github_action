@@ -1,21 +1,26 @@
 name: "Hello World"
 description: "Greet someone and record the time"
 inputs:
-    removePreviousSwarmSecrets:
+    remove-previous-swarm-secrets:
         description: boolean
         required: true
-    swarmSecretsPrefix:
+    swarm-secrets-prefix:
+        description: string
         default: SWARM_
         required: true
-    sshServerAddress:
+    ssh-server-address:
+        description: string
         required: true
-    sshServerPort:
+    ssh-server-port:
+        description: string
         required: true
-    sshServerUsername:
+    ssh-server-username:
+        description: string
         required: true
-    sshServerPassword:
+    ssh-server-password:
+        description: string
         required: true
-    secretsJson:
+    secrets-json:
         description: "secrets to be created in targeted docker swarm. comes from 'toJson(secrets)' context or an input json."
         required: true
 runs:
