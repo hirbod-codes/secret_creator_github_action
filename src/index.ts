@@ -36,7 +36,12 @@ async function run() {
 
             const secretsJson: string = core.getInput('secrets-json', { required: true, trimWhitespace: true })
 
-            const secrets = JSON.parse(secretsJson)
+            let secrets: object | undefined = undefined
+            try {
+                secrets = JSON.parse(secretsJson)
+            } catch (error) {
+                core.warning('failed to parse provided secrets json')
+            }
 
             const client = new Client()
 
@@ -52,6 +57,9 @@ async function run() {
 
                     if (Boolean(removePreviousSwarmSecrets) === true)
                         await execution(client, 'docker secret rm $(docker secret ls -q)')
+
+                    if (!secrets)
+                        return
 
                     const filteredSecretEntries = Object
                         .entries(secrets)
