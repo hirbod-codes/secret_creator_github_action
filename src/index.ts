@@ -1,12 +1,11 @@
 import * as core from '@actions/core'
-import { Client, ClientCallback, ClientChannel } from 'ssh2'
+import { Client, ClientChannel } from 'ssh2'
 
 function execution(client: Client, command: string): Promise<void> {
     return new Promise((res, rej) => {
         client.exec(command, (err: Error | undefined, stream: ClientChannel) => {
-            if (err) {
+            if (err)
                 throw err
-            }
 
             stream.on('close', (code: any, signal: any) => {
                 console.log('Stream :: close :: code: ' + code + ', signal: ' + signal);
