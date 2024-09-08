@@ -1,6 +1,7 @@
 {
     "name": "secret_creator_github_action",
     "version": "1.0.0",
+    "private": true,
     "main": "index.js",
     "scripts": {
         "build": "tsc && ncc build lib/index.js",

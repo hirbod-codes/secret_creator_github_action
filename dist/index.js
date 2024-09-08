@@ -88,7 +88,9 @@ async function run() {
                     core.info(JSON.stringify(filteredSecretEntries, undefined, 4));
                     for (let i = 0; i < filteredSecretEntries.length; i++) {
                         const secretEntry = filteredSecretEntries[i];
-                        await execution(client, `echo ${secretEntry[1]} | docker secret create ${secretEntry[0].replace(swarmSecretsPrefix, '')}  -`);
+                        const secretName = secretEntry[0].replace(swarmSecretsPrefix, '');
+                        const secretValue = secretEntry[1];
+                        await execution(client, `docker secret rm ${secretName}; echo ${secretValue} | docker secret create ${secretName}  -`);
                     }
                     res();
                 }
