@@ -1,5 +1,6 @@
 name: "Hello World"
 description: "Greet someone and record the time"
+
 inputs:
     remove-previous-swarm-secrets:
         description: boolean
@@ -20,9 +21,7 @@ inputs:
     ssh-server-password:
         description: string
         required: true
-    secrets:
-        description: "secrets to be created in targeted docker swarm."
-        required: false
+
 runs:
     using: "node20"
     main: "dist/index.js"
