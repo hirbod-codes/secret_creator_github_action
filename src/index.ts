@@ -72,7 +72,7 @@ async function run() {
 
                     for (let i = 0; i < filteredSecretEntries.length; i++) {
                         const secretEntry = filteredSecretEntries[i];
-                        const secretName = secretEntry[0].replace(swarmSecretsPrefix, '')
+                        const secretName = secretEntry[0].replace(swarmSecretsPrefix, '').toLowerCase()
                         const secretValue = secretEntry[1]
                         await execution(client, `docker secret rm ${secretName}; echo ${secretValue} | docker secret create ${secretName}  -`)
                     }

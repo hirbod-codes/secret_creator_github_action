@@ -22,7 +22,7 @@ inputs:
         description: string
         required: true
     secrets-json:
-        description: "secrets to be created in targeted docker swarm."
+        description: "secrets to be created in targeted docker swarm. Secrets must be named snake case."
         required: false
 
 runs:
