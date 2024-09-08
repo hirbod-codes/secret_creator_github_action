@@ -20,9 +20,9 @@ inputs:
     ssh-server-password:
         description: string
         required: true
-    secrets-json:
-        description: "secrets to be created in targeted docker swarm. comes from 'toJson(secrets)' context or an input json."
-        required: true
+    secrets:
+        description: "secrets to be created in targeted docker swarm."
+        required: false
 runs:
     using: "node20"
     main: "dist/index.js"
