@@ -51,19 +51,20 @@ async function run() {
     const promise = () => new Promise((res, rej) => {
         try {
             core.info('collecting input variables...');
-            const removePreviousSwarmSecrets = core.getInput('remove-previous-swarm-secrets');
-            const swarmSecretsPrefix = core.getInput('swarm-secrets-prefix');
-            const SSH_SERVER_ADDRESS = core.getInput('ssh-server-address');
-            const SSH_SERVER_PORT = core.getInput('ssh-server-port');
-            const SSH_SERVER_USERNAME = core.getInput('ssh-server-username');
-            const SSH_SERVER_PASSWORD = core.getInput('ssh-server-password');
-            // const secretsJson: string = core.getInput('secrets', {  trimWhitespace: true })
+            const removePreviousSwarmSecrets = core.getInput('remove-previous-swarm-secrets', { required: true, trimWhitespace: true });
+            const swarmSecretsPrefix = core.getInput('swarm-secrets-prefix', { required: true, trimWhitespace: true });
+            const SSH_SERVER_ADDRESS = core.getInput('ssh-server-address', { required: true, trimWhitespace: true });
+            const SSH_SERVER_PORT = core.getInput('ssh-server-port', { required: true, trimWhitespace: true });
+            const SSH_SERVER_USERNAME = core.getInput('ssh-server-username', { required: true, trimWhitespace: true });
+            const SSH_SERVER_PASSWORD = core.getInput('ssh-server-password', { required: true, trimWhitespace: true });
+            const secretsJson = core.getInput('secrets', { required: true, trimWhitespace: true });
             let secrets = undefined;
-            // try {
-            //     secrets = JSON.parse(secretsJson)
-            // } catch (error) {
-            //     core.warning('failed to parse provided secrets json.')
-            // }
+            try {
+                secrets = JSON.parse(secretsJson);
+            }
+            catch (error) {
+                core.warning('failed to parse provided secrets json.');
+            }
             core.info('adding event listeners...');
             const client = new ssh2_1.Client();
             client.on('close', () => core.info('close'));

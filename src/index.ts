@@ -26,22 +26,22 @@ async function run() {
         try {
             core.info('collecting input variables...')
 
-            const removePreviousSwarmSecrets: string = core.getInput('remove-previous-swarm-secrets')
-            const swarmSecretsPrefix: string = core.getInput('swarm-secrets-prefix')
+            const removePreviousSwarmSecrets: string = core.getInput('remove-previous-swarm-secrets', { required: true, trimWhitespace: true })
+            const swarmSecretsPrefix: string = core.getInput('swarm-secrets-prefix', { required: true, trimWhitespace: true })
 
-            const SSH_SERVER_ADDRESS: string = core.getInput('ssh-server-address')
-            const SSH_SERVER_PORT: string = core.getInput('ssh-server-port')
-            const SSH_SERVER_USERNAME: string = core.getInput('ssh-server-username')
-            const SSH_SERVER_PASSWORD: string = core.getInput('ssh-server-password')
+            const SSH_SERVER_ADDRESS: string = core.getInput('ssh-server-address', { required: true, trimWhitespace: true })
+            const SSH_SERVER_PORT: string = core.getInput('ssh-server-port', { required: true, trimWhitespace: true })
+            const SSH_SERVER_USERNAME: string = core.getInput('ssh-server-username', { required: true, trimWhitespace: true })
+            const SSH_SERVER_PASSWORD: string = core.getInput('ssh-server-password', { required: true, trimWhitespace: true })
 
-            // const secretsJson: string = core.getInput('secrets', {  trimWhitespace: true })
+            const secretsJson: string = core.getInput('secrets', { required: true, trimWhitespace: true })
 
             let secrets: object | undefined = undefined
-            // try {
-            //     secrets = JSON.parse(secretsJson)
-            // } catch (error) {
-            //     core.warning('failed to parse provided secrets json.')
-            // }
+            try {
+                secrets = JSON.parse(secretsJson)
+            } catch (error) {
+                core.warning('failed to parse provided secrets json.')
+            }
 
             core.info('adding event listeners...')
             const client = new Client()

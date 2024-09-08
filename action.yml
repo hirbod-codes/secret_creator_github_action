@@ -4,22 +4,25 @@ description: "Greet someone and record the time"
 inputs:
     remove-previous-swarm-secrets:
         description: boolean
-        required: false
+        required: true
     swarm-secrets-prefix:
         description: string
         default: SWARM_
-        required: false
+        required: true
     ssh-server-address:
         description: string
-        required: false
+        required: true
     ssh-server-port:
         description: string
-        required: false
+        required: true
     ssh-server-username:
         description: string
-        required: false
+        required: true
     ssh-server-password:
         description: string
+        required: true
+    secrets:
+        description: "secrets to be created in targeted docker swarm."
         required: false
 
 runs:
