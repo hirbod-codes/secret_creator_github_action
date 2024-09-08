@@ -38,7 +38,7 @@ async function run() {
             try {
                 secrets = JSON.parse(secretsJson)
             } catch (error) {
-                core.warning('failed to parse provided secrets json')
+                core.warning('failed to parse provided secrets json.')
             }
 
             const client = new Client()
