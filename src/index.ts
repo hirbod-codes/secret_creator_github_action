@@ -24,6 +24,8 @@ function execution(client: Client, command: string): Promise<void> {
 async function run() {
     const promise = () => new Promise<void>((res, rej) => {
         try {
+            core.info('collecting input variables...')
+
             const removePreviousSwarmSecrets: string = core.getInput('remove-previous-swarm-secrets', { required: true, trimWhitespace: true })
             const swarmSecretsPrefix: string = core.getInput('swarm-secrets-prefix', { required: true, trimWhitespace: true })
 
@@ -41,6 +43,7 @@ async function run() {
             //     core.warning('failed to parse provided secrets json.')
             // }
 
+            core.info('adding event listeners...')
             const client = new Client()
 
             client.on('close', () => core.info('close'))
@@ -81,6 +84,7 @@ async function run() {
                 }
             })
 
+            core.info('connecting...')
             client.connect({
                 host: SSH_SERVER_ADDRESS,
                 port: Number.parseInt(SSH_SERVER_PORT),
