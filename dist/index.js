@@ -33,76 +33,90 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const ssh2_1 = __nccwpck_require__(5869);
 function execution(client, command) {
+    core.info(`executing command: ${command}`);
     return new Promise((res, rej) => {
         client.exec(command, (err, stream) => {
             if (err)
                 throw err;
             stream.on('close', (code, signal) => {
-                console.log('Stream :: close :: code: ' + code + ', signal: ' + signal);
+                core.info('Stream :: close :: code: ' + code + ', signal: ' + signal);
                 res();
             });
-            stream.on('data', (data) => {
-                console.log('STDOUT: ' + data);
-            });
-            stream.stderr.on('data', (data) => {
-                console.log('STDERR: ' + data);
-            });
+            stream.on('data', (data) => core.info('STDOUT: ' + data));
+            stream.stderr.on('data', (data) => core.info('STDERR: ' + data));
         });
     });
 }
 async function run() {
-    try {
-        const e = process.env;
-        const removePreviousSwarmSecrets = core.getInput('removePreviousSwarmSecrets', { trimWhitespace: true });
-        const swarmSecretsPrefix = core.getInput('swarmSecretsPrefix', { trimWhitespace: true });
-        const SSH_SERVER_ADDRESS = core.getInput('sshServerAddress', { trimWhitespace: true });
-        const SSH_SERVER_PORT = core.getInput('sshServerPort', { trimWhitespace: true });
-        const SSH_SERVER_USERNAME = core.getInput('sshServerUsername', { trimWhitespace: true });
-        const SSH_SERVER_PASSWORD = core.getInput('sshServerPassword', { trimWhitespace: true });
-        const secretsJson = core.getInput('secretsJson', { trimWhitespace: true });
-        const secrets = JSON.parse(secretsJson);
-        const client = new ssh2_1.Client();
-        client.on('close', () => core.info('close'));
-        client.on('end', () => core.info('end'));
-        client.on('error', (err) => { throw err; });
-        client.on('ready', async () => {
-            try {
-                core.info('Client :: ready');
-                if (Boolean(removePreviousSwarmSecrets) === true)
-                    await execution(client, 'docker secret rm $(docker secret ls -q)');
-                const filteredSecretEntries = Object
-                    .entries(secrets)
-                    .filter(s => s[0].startsWith(swarmSecretsPrefix));
-                for (let i = 0; i < filteredSecretEntries.length; i++) {
-                    const secretEntry = filteredSecretEntries[i];
-                    await execution(client, `${secretEntry[1]} | docker secret create ${secretEntry[0]}  -`);
+    const promise = () => new Promise((res, rej) => {
+        try {
+            core.info('collecting input variables...');
+            const removePreviousSwarmSecrets = core.getInput('remove-previous-swarm-secrets');
+            const swarmSecretsPrefix = core.getInput('swarm-secrets-prefix');
+            const SSH_SERVER_ADDRESS = core.getInput('ssh-server-address');
+            const SSH_SERVER_PORT = core.getInput('ssh-server-port');
+            const SSH_SERVER_USERNAME = core.getInput('ssh-server-username');
+            const SSH_SERVER_PASSWORD = core.getInput('ssh-server-password');
+            // const secretsJson: string = core.getInput('secrets', {  trimWhitespace: true })
+            let secrets = undefined;
+            // try {
+            //     secrets = JSON.parse(secretsJson)
+            // } catch (error) {
+            //     core.warning('failed to parse provided secrets json.')
+            // }
+            core.info('adding event listeners...');
+            const client = new ssh2_1.Client();
+            client.on('close', () => core.info('close'));
+            client.on('end', () => core.info('end'));
+            client.on('error', (err) => { throw err; });
+            client.on('ready', async () => {
+                try {
+                    core.info('Client :: ready');
+                    if (Boolean(removePreviousSwarmSecrets) === true)
+                        await execution(client, 'docker secret rm $(docker secret ls -q)');
+                    if (!secrets) {
+                        res();
+                        return;
+                    }
+                    const filteredSecretEntries = Object
+                        .entries(secrets)
+                        .filter(s => s[0].startsWith(swarmSecretsPrefix));
+                    for (let i = 0; i < filteredSecretEntries.length; i++) {
+                        const secretEntry = filteredSecretEntries[i];
+                        await execution(client, `${secretEntry[1]} | docker secret create ${secretEntry[0]}  -`);
+                    }
+                    res();
                 }
-            }
-            catch (err) {
-                client.end();
-                throw err;
-            }
-            finally {
-                client.end();
-            }
-        });
-        core.info(SSH_SERVER_ADDRESS.slice(0, 5));
-        client.connect({
-            host: SSH_SERVER_ADDRESS,
-            port: Number.parseInt(SSH_SERVER_PORT),
-            username: SSH_SERVER_USERNAME,
-            password: SSH_SERVER_PASSWORD,
-        });
-        setTimeout(() => { core.info('timeout'); }, 60000);
-    }
-    catch (error) {
-        if (error instanceof Error)
-            core.setFailed(error);
-        else
-            core.setFailed('failure');
-    }
+                catch (err) {
+                    client.end();
+                    res();
+                    throw err;
+                }
+                finally {
+                    client.end();
+                    res();
+                }
+            });
+            core.info('connecting...');
+            client.connect({
+                host: SSH_SERVER_ADDRESS,
+                port: Number.parseInt(SSH_SERVER_PORT),
+                username: SSH_SERVER_USERNAME,
+                password: SSH_SERVER_PASSWORD,
+            });
+        }
+        catch (error) {
+            if (error instanceof Error)
+                core.setFailed(error);
+            else
+                core.setFailed('failure');
+            throw error;
+        }
+    });
+    await promise();
 }
-run();
+run()
+    .then(() => core.info('finish.'));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
