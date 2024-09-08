@@ -68,9 +68,11 @@ async function run() {
                         .entries(secrets)
                         .filter(s => s[0].startsWith(swarmSecretsPrefix))
 
+                    core.info(JSON.stringify(filteredSecretEntries, undefined, 4))
+
                     for (let i = 0; i < filteredSecretEntries.length; i++) {
                         const secretEntry = filteredSecretEntries[i];
-                        await execution(client, `${secretEntry[1]} | docker secret create ${secretEntry[0]}  -`)
+                        await execution(client, `echo ${secretEntry[1]} | docker secret create ${secretEntry[0]}  -`)
                     }
 
                     res()

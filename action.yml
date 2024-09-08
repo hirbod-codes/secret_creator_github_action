@@ -1,5 +1,5 @@
-name: "Hello World"
-description: "Greet someone and record the time"
+name: "Secret creator"
+description: "Creates docker swarm secrets through an ssh connection."
 
 inputs:
     remove-previous-swarm-secrets:
