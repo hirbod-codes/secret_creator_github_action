@@ -35,11 +35,11 @@ async function run() {
             const secretsJson: string = core.getInput('secrets-json', { required: true, trimWhitespace: true })
 
             let secrets: object | undefined = undefined
-            try {
-                secrets = JSON.parse(secretsJson)
-            } catch (error) {
-                core.warning('failed to parse provided secrets json.')
-            }
+            // try {
+            //     secrets = JSON.parse(secretsJson)
+            // } catch (error) {
+            //     core.warning('failed to parse provided secrets json.')
+            // }
 
             const client = new Client()
 
