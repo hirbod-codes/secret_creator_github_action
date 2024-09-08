@@ -26,15 +26,15 @@ async function run() {
         try {
             core.info('collecting input variables...')
 
-            const removePreviousSwarmSecrets: string = core.getInput('remove-previous-swarm-secrets', { required: true, trimWhitespace: true })
-            const swarmSecretsPrefix: string = core.getInput('swarm-secrets-prefix', { required: true, trimWhitespace: true })
+            const removePreviousSwarmSecrets: string = core.getInput('remove-previous-swarm-secrets', { trimWhitespace: true })
+            const swarmSecretsPrefix: string = core.getInput('swarm-secrets-prefix', { trimWhitespace: true })
 
-            const SSH_SERVER_ADDRESS: string = core.getInput('ssh-server-address', { required: true, trimWhitespace: true })
-            const SSH_SERVER_PORT: string = core.getInput('ssh-server-port', { required: true, trimWhitespace: true })
-            const SSH_SERVER_USERNAME: string = core.getInput('ssh-server-username', { required: true, trimWhitespace: true })
-            const SSH_SERVER_PASSWORD: string = core.getInput('ssh-server-password', { required: true, trimWhitespace: true })
+            const SSH_SERVER_ADDRESS: string = core.getInput('ssh-server-address', { trimWhitespace: true })
+            const SSH_SERVER_PORT: string = core.getInput('ssh-server-port', { trimWhitespace: true })
+            const SSH_SERVER_USERNAME: string = core.getInput('ssh-server-username', { trimWhitespace: true })
+            const SSH_SERVER_PASSWORD: string = core.getInput('ssh-server-password', { trimWhitespace: true })
 
-            // const secretsJson: string = core.getInput('secrets', { required: true, trimWhitespace: true })
+            // const secretsJson: string = core.getInput('secrets', {  trimWhitespace: true })
 
             let secrets: object | undefined = undefined
             // try {

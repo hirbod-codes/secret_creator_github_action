@@ -4,23 +4,23 @@ description: "Greet someone and record the time"
 inputs:
     remove-previous-swarm-secrets:
         description: boolean
-        required: true
+        required: false
     swarm-secrets-prefix:
         description: string
         default: SWARM_
-        required: true
+        required: false
     ssh-server-address:
         description: string
-        required: true
+        required: false
     ssh-server-port:
         description: string
-        required: true
+        required: false
     ssh-server-username:
         description: string
-        required: true
+        required: false
     ssh-server-password:
         description: string
-        required: true
+        required: false
 
 runs:
     using: "node20"
