@@ -57,7 +57,7 @@ async function run() {
             const SSH_SERVER_PORT = core.getInput('ssh-server-port', { required: true, trimWhitespace: true });
             const SSH_SERVER_USERNAME = core.getInput('ssh-server-username', { required: true, trimWhitespace: true });
             const SSH_SERVER_PASSWORD = core.getInput('ssh-server-password', { required: true, trimWhitespace: true });
-            const secretsJson = core.getInput('secrets', { required: true, trimWhitespace: true });
+            const secretsJson = core.getInput('secrets-json', { required: true, trimWhitespace: true });
             let secrets = undefined;
             try {
                 secrets = JSON.parse(secretsJson);
