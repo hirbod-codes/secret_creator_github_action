@@ -16,10 +16,7 @@ function execution(client: Client, command: string): Promise<void> {
 
             stream.on('data', (data: any) => core.info('STDOUT: ' + data))
 
-            stream.stderr.on('data', (data) => {
-                core.error('STDERR: ' + data)
-                throw new Error('STDERR: ' + data)
-            })
+            stream.stderr.on('data', (data) => core.error('STDERR: ' + data))
         })
     })
 }

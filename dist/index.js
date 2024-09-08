@@ -43,10 +43,7 @@ function execution(client, command) {
                 res();
             });
             stream.on('data', (data) => core.info('STDOUT: ' + data));
-            stream.stderr.on('data', (data) => {
-                core.error('STDERR: ' + data);
-                throw new Error('STDERR: ' + data);
-            });
+            stream.stderr.on('data', (data) => core.error('STDERR: ' + data));
         });
     });
 }
