@@ -2,23 +2,21 @@ import * as core from '@actions/core'
 import { Client, ClientChannel } from 'ssh2'
 
 function execution(client: Client, command: string): Promise<void> {
+    core.info(`executing command: ${command}`)
+
     return new Promise((res, rej) => {
         client.exec(command, (err: Error | undefined, stream: ClientChannel) => {
             if (err)
                 throw err
 
             stream.on('close', (code: any, signal: any) => {
-                console.log('Stream :: close :: code: ' + code + ', signal: ' + signal);
+                core.info('Stream :: close :: code: ' + code + ', signal: ' + signal);
                 res()
             })
 
-            stream.on('data', (data: any) => {
-                console.log('STDOUT: ' + data);
-            })
+            stream.on('data', (data: any) => core.info('STDOUT: ' + data))
 
-            stream.stderr.on('data', (data) => {
-                console.log('STDERR: ' + data);
-            })
+            stream.stderr.on('data', (data) => core.info('STDERR: ' + data))
         })
     })
 }
@@ -58,8 +56,10 @@ async function run() {
                     if (Boolean(removePreviousSwarmSecrets) === true)
                         await execution(client, 'docker secret rm $(docker secret ls -q)')
 
-                    if (!secrets)
+                    if (!secrets) {
+                        res()
                         return
+                    }
 
                     const filteredSecretEntries = Object
                         .entries(secrets)
@@ -101,4 +101,4 @@ async function run() {
 }
 
 run()
-    .then(() => console.log('finish.'))
+    .then(() => core.info('finish.'))
