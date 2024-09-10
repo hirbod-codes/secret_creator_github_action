@@ -26,7 +26,6 @@ async function run() {
         try {
             core.info('collecting input variables...')
 
-            const removePreviousSwarmSecrets: string = core.getInput('remove-previous-swarm-secrets', { required: true, trimWhitespace: true })
             const swarmSecretsPrefix: string = core.getInput('swarm-secrets-prefix', { required: true, trimWhitespace: true })
 
             const SSH_SERVER_ADDRESS: string = core.getInput('ssh-server-address', { required: true, trimWhitespace: true })
@@ -55,9 +54,6 @@ async function run() {
             client.on('ready', async () => {
                 try {
                     core.info('Client :: ready')
-
-                    if (Boolean(removePreviousSwarmSecrets) === true)
-                        await execution(client, 'docker secret rm $(docker secret ls -q)')
 
                     if (!secrets) {
                         res()

@@ -2,9 +2,6 @@ name: "Secret creator"
 description: "Creates docker swarm secrets through an ssh connection."
 
 inputs:
-    remove-previous-swarm-secrets:
-        description: boolean
-        required: true
     swarm-secrets-prefix:
         description: string
         default: SWARM_
